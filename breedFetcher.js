@@ -1,15 +1,24 @@
-const requestInfo = require("./requestInfo");
+const request = require("request");
 
-// getting arguments form the console
-const arguments = process.argv.slice(2, process.argv.length);
+// Request infor from API via provided url request
+const fetchBreedDescription = function(breedName, callback) {
+  const url = 'https://api.thecatapi.com/v1/breeds/search?q=' + breedName;
+  request(url, (error, response, body) => {
+    if (error) {
+      callback(error, null);
+    }
+    if (body) {
+      const data = JSON.parse(body);
+      let result = '';
+      if (data.length > 0) {
+        result = data[0].description;
+      } else {
+        result = 'No cat was found.';
 
-/*
-  If we have an aruments, then we can procees with connection
-*/
-if (arguments.length == 1) {
-  const url = 'https://api.thecatapi.com/v1/breeds/search?q=' + arguments[0];
-  requestInfo(url);
-} else {
-  console.log("No arguments were provided");
-}
+      }
+      callback(null, result);
+    }
+  });
+};
 
+module.exports = fetchBreedDescription;
